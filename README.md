@@ -99,21 +99,6 @@ Frontend
 FitSpot/
 ├── index.html              # Home page (hero, plans, classes, schedule, booking)
 ├── README.md
-├── api/
-│   ├── db.php              # PDO connection, sessions, JSON helpers
-│   ├── login.php           # POST: authenticate + start session
-│   ├── logout.php          # POST: destroy session
-│   ├── register.php        # POST: create a member account (bcrypt)
-│   ├── me.php              # GET: current logged-in user (page guards)
-│   ├── plans.php           # GET public / POST, PUT, DELETE admin
-│   ├── classes.php         # GET (admin list or ?upcoming=1 with slot usage) / CRUD
-│   ├── schedules.php       # GET (?all=1 admin) / POST create or toggle status, DELETE
-│   ├── members.php         # GET, DELETE (admin)
-│   ├── reservations.php    # GET, POST confirm/cancel (admin)
-│   ├── bookings.php        # GET my bookings / POST book (transaction) / cancel
-│   ├── membership.php      # POST: switch my plan
-│   ├── profile.php         # GET, POST: my profile + membership
-│   └── stats.php           # GET: dashboard counters + recent reservations
 ├── css/
 │   ├── style.css            # Site styles
 │   ├── admin.css            # Admin panel styles

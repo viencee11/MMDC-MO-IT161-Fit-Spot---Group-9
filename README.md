@@ -74,11 +74,11 @@ The website is simple and manageable to develop but still has enough features fo
 - Full-screen responsive hero with badge, headline, CTAs, and stats
 - Automatic image carousel in the hero (4 slides, dots, 3-second autoplay)
 - Login/Register popup with branding panel and demo admin/member credentials
-- Admin panel (one HTML file per section): sidebar links, dashboard stats (`pages/admin/dashboard.html`), plans/classes CRUD with modal forms (`memberships.html`, `classes.html`), add/delete/open/close schedules with slot bars, members, reservations (confirm/cancel), confirmation popups, avatar menu (Profile, Settings, Logout) - all backed by the PHP API
-- Member portal (one HTML file per section): overview stats (`pages/users/dashboard.html`), membership plan cards with choose-plan (`memberships.html`), class browsing with slot bars and book/cancel (`classes.html`), My Bookings table with empty state (`bookings.html`), profile form (`profile.html`) - all backed by the PHP API
-- PHP backend (`api/`): session login/logout, registration, plans/classes/schedules/members/reservations CRUD, transactional booking with capacity checks, profile and membership updates, dashboard stats
-- MySQL database: feature-to-table design in `Database/MySQL/database.md`, importable schema + seed data in `Database/MySQL/fitspot.sql` (6 tables, slot-usage view, demo accounts, demo bookings)
-- Feature-folder structure (`api/`, `css/`, `js/`, `images/`, `Database/MySQL`, `pages/admin/`, `pages/users`)
+- Admin panel (one HTML file per section): sidebar links, dashboard stats (`pages/admin/dashboard.html`), plans/classes CRUD with modal forms (`memberships.html`, `classes.html`), add/delete/open/close schedules with slot bars, members, reservations (confirm/cancel), confirmation popups, avatar menu (Profile, Settings, Logout)
+- Member portal (one HTML file per section): overview stats (`pages/users/dashboard.html`), membership plan cards with choose-plan (`memberships.html`), class browsing with slot bars and book/cancel (`classes.html`), My Bookings table with empty state (`bookings.html`), profile form (`profile.html`)
+- Browser data service (`js/api.js`): local login/logout, registration, plans/classes/schedules/members/reservations CRUD, booking capacity checks, profile and membership updates, and dashboard stats
+- Browser `localStorage` stores seeded data and the current session
+- Feature-folder structure (`css/`, `js/`, `images/`, `pages/admin/`, `pages/users`)
 
 ## Tech Stack (Current)
 

@@ -320,9 +320,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 await apiCall('GET', 'me.php');
             } catch (error) {
                 if (error.message === 'Please log in first.') {
-                    openModal('login-popup');
-                    showMessage(document.getElementById('popup-login-message'),
-                        'Log in with a member account to book a class.', false);
+                    openModal('register-popup');
+                    showMessage(document.getElementById('popup-register-message'),
+                        'Create a member account to book a class.', false);
                 } else {
                     showMessage(bookingMessage, friendlyMessage(error, 'Something went wrong while booking your class.', SERVER_HINT), false);
                     toast.error(friendlyMessage(error, 'Something went wrong while booking your class.'));

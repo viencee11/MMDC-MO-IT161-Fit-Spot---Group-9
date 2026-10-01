@@ -14,7 +14,7 @@ FitSpot is a website where users can check gym membership plans, view available 
 
 ## Login Credentials
 
-Demo accounts (login is checked against the MySQL `users` table by `api/login.php`):
+Demo accounts are seeded in the browser by `js/api.js`:
 
 | Role   | Email              | Password  | Redirect      |
 | ------ | ------------------ | --------- | ------------- |

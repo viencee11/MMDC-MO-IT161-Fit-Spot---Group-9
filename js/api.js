@@ -133,10 +133,14 @@
     }
 
     window.apiCall = async function (method, file, body) {
-        const options = { method: method, headers: {} };
-        if (body !== undefined) {
-            options.headers['Content-Type'] = 'application/json';
-            options.body = JSON.stringify(body);
+        const endpoint = file.split('?')[0];
+        const query = new URLSearchParams(file.split('?')[1] || '');
+        let user, item, id;
+        if (endpoint === 'login.php' && method === 'POST') {
+            user = state.users.find(function (entry) { return entry.email === String(body.email).toLowerCase() && entry.password === body.password; });
+            if (!user) fail('Invalid email or password.', 401);
+            localStorage.setItem(SESSION_KEY, String(user.id));
+            return { id: user.id, role: user.role };
         }
         let res;
         try {

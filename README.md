@@ -115,7 +115,8 @@ FitSpot/
 │   ├── kettlebellswings.jpg     # Hero carousel slide 3
 │   └── jumping.jpg              # Hero carousel slide 4
 ├── js/
-│   ├── script.js           # Login/Register, homepage live data, booking form, hero carousel
+│   ├── api.js              # Browser data service and local storage
+│   ├── script.js           # Login/Register, homepage data, booking form, hero carousel
 │   ├── admin.js            # Admin panel logic (API guard, CRUD, modals, avatar menu)
 │   └── user.js             # Member portal logic (API guard, booking/cancel, plans, profile)
 └── pages/

@@ -35,7 +35,7 @@ Open `index.html` directly in a browser, or use any simple static file server. N
 - View membership plans, prices, and inclusions (stored locally in the browser)
 - Browse fitness classes such as Zumba, Yoga, Pilates, Boxing, and Strength Training
 - View available dates, times, and slots (live from `class_schedules` with real booked counts)
-- Book or cancel a class (capacity and duplicate-booking rules enforced in a MySQL transaction)
+- Book or cancel a class (capacity and duplicate-booking rules enforced in `js/api.js`)
 - View upcoming bookings
 - Admin can add, edit, or remove membership plans and classes
 - Admin can manage schedules, members, and reservations

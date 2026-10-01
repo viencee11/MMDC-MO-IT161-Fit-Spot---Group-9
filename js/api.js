@@ -142,13 +142,41 @@
             localStorage.setItem(SESSION_KEY, String(user.id));
             return { id: user.id, role: user.role };
         }
-        let res;
-        try {
-            res = await fetch(API + file, options);
-        } catch (networkError) {
-            const error = new Error('Could not reach the server.');
-            error.kind = 'network';
-            throw error;
+        if (endpoint === 'register.php' && method === 'POST') {
+            if (!body.full_name || !body.email || !body.password) fail('Please complete all required fields.');
+            if (body.password.length < 6) fail('Password must be at least 6 characters.');
+            if (state.users.some(function (entry) { return entry.email === body.email.toLowerCase(); })) fail('An account with that email already exists.', 409);
+            id = state.next.user++;
+            state.users.push({ id: id, full_name: body.full_name, email: body.email.toLowerCase(), password: body.password, role: 'member', phone: '', address: '', created_at: dateOffset(0) });
+            saveState(); return { id: id };
+        }
+        if (endpoint === 'logout.php') { localStorage.removeItem(SESSION_KEY); return { ok: true }; }
+        if (endpoint === 'me.php') return profileView(requireUser());
+        if (endpoint === 'plans.php' && method === 'GET') return { plans: state.plans.filter(function (plan) { return plan.is_active; }) };
+        if (endpoint === 'classes.php' && method === 'GET' && query.get('upcoming') === '1') {
+            user = requireUser('member');
+            return { schedules: state.schedules.filter(function (schedule) { return schedule.date >= dateOffset(0); }).map(function (schedule) { const view = scheduleView(schedule); const mine = state.bookings.find(function (booking) { return booking.user_id === user.id && booking.schedule_id === schedule.id && booking.status !== 'cancelled'; }); view.my_status = mine ? mine.status : null; return view; }) };
+        }
+        if (endpoint === 'classes.php' && method === 'GET') return { classes: state.classes.filter(function (fitnessClass) { return fitnessClass.is_active; }).map(function (fitnessClass) { const next = state.schedules.filter(function (schedule) { return schedule.class_id === fitnessClass.id && schedule.date >= dateOffset(0) && schedule.status === 'open'; }).sort(function (a, b) { return a.date.localeCompare(b.date); })[0]; return Object.assign({}, fitnessClass, { next_schedule: next ? scheduleLabel(next) : null }); }) };
+        if (endpoint === 'schedules.php' && method === 'GET') return { schedules: state.schedules.filter(function (schedule) { return query.get('all') === '1' || (schedule.date >= dateOffset(0) && schedule.status !== 'cancelled'); }).map(scheduleView) };
+        if (endpoint === 'bookings.php' && method === 'GET') return { bookings: state.bookings.filter(function (booking) { return booking.user_id === requireUser('member').id; }).map(bookingView) };
+        if (endpoint === 'profile.php' && method === 'GET') return profileView(requireUser());
+        if (endpoint === 'stats.php' && method === 'GET') { requireUser('admin'); return { stats: { total_members: state.users.filter(function (entry) { return entry.role === 'member'; }).length, total_plans: state.plans.filter(function (entry) { return entry.is_active; }).length, total_classes: state.classes.filter(function (entry) { return entry.is_active; }).length, pending_reservations: state.bookings.filter(function (entry) { return entry.status === 'pending'; }).length }, recent: state.bookings.slice().reverse().slice(0, 5).map(function (booking) { const view = bookingView(booking); const member = state.users.find(function (entry) { return entry.id === booking.user_id; }); return { member: member ? member.full_name : 'Unknown', class_name: view.class_name, schedule: view.schedule, status_label: view.status_label, status_color: view.status_color }; }) }; }
+        if (endpoint === 'members.php' && method === 'GET') { requireUser('admin'); return { members: state.users.filter(function (entry) { return entry.role === 'member'; }).map(function (entry) { const plan = planForUser(entry.id); const membership = state.memberships.find(function (item) { return item.user_id === entry.id && item.status === 'active'; }); const active = membership && membership.end_date >= dateOffset(0); return { id: entry.id, full_name: entry.full_name, email: entry.email, plan: plan ? plan.name : 'No plan', status_label: active ? 'Active' : 'No membership', status_color: active ? 'badge-green' : 'badge-gray' }; }) }; }
+        if (endpoint === 'reservations.php' && method === 'GET') { requireUser('admin'); return { reservations: state.bookings.map(function (booking) { const view = bookingView(booking); const member = state.users.find(function (entry) { return entry.id === booking.user_id; }); return { id: booking.id, member: member ? member.full_name : 'Unknown', class_name: view.class_name, schedule: view.schedule, status: view.status, status_label: view.status_label, status_color: view.status_color }; }) }; }
+        if (endpoint === 'plans.php' && ['POST', 'PUT', 'DELETE'].indexOf(method) !== -1) { requireUser('admin');
+            if (method === 'DELETE') { if (state.memberships.some(function (membership) { return membership.plan_id === Number(body.id); })) fail('This plan is currently used by a member.'); state.plans = state.plans.filter(function (plan) { return plan.id !== Number(body.id); }); saveState(); return { id: Number(body.id) }; }
+            if (!body.name || body.price === '' || !body.inclusions) fail('Please fill in all fields.');
+            if (method === 'POST') { id = state.next.plan++; state.plans.push({ id: id, name: body.name, price: Number(body.price), inclusions: body.inclusions, is_active: 1 }); }
+            else { item = state.plans.find(function (plan) { return plan.id === Number(body.id); }); if (!item) fail('Plan not found.', 404); Object.assign(item, { name: body.name, price: Number(body.price), inclusions: body.inclusions }); id = item.id; }
+            saveState(); return { id: id };
+        }
+        if (endpoint === 'classes.php' && ['POST', 'PUT', 'DELETE'].indexOf(method) !== -1) { requireUser('admin');
+            if (method === 'DELETE') { state.classes = state.classes.filter(function (entry) { return entry.id !== Number(body.id); }); state.schedules = state.schedules.filter(function (schedule) { return schedule.class_id !== Number(body.id); }); saveState(); return { id: Number(body.id) }; }
+            if (!body.name || Number(body.capacity) < 1) fail('Please fill in all fields.');
+            if (method === 'POST') { id = state.next.fitnessClass++; state.classes.push({ id: id, name: body.name, description: body.description || '', capacity: Number(body.capacity), is_active: 1 }); }
+            else { item = state.classes.find(function (entry) { return entry.id === Number(body.id); }); if (!item) fail('Class not found.', 404); Object.assign(item, { name: body.name, description: body.description || '', capacity: Number(body.capacity) }); id = item.id; }
+            saveState(); return { id: id };
         }
         let data = null;
         try { data = await res.json(); } catch (parseError) {}

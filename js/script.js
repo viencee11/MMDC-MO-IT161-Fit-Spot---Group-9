@@ -264,9 +264,9 @@ document.addEventListener('DOMContentLoaded', function () {
             await apiCall('GET', 'me.php');
         } catch (error) {
             if (error.message === 'Please log in first.') {
-                openModal('login-popup');
-                showMessage(document.getElementById('popup-login-message'),
-                    'Log in with a member account to choose a plan.', false);
+                openModal('register-popup');
+                showMessage(document.getElementById('popup-register-message'),
+                    'Create a member account to choose a plan.', false);
             } else {
                 showMessage(message, friendlyMessage(error, 'Unable to complete your request.', SERVER_HINT), false);
             }

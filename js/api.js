@@ -178,16 +178,10 @@
             else { item = state.classes.find(function (entry) { return entry.id === Number(body.id); }); if (!item) fail('Class not found.', 404); Object.assign(item, { name: body.name, description: body.description || '', capacity: Number(body.capacity) }); id = item.id; }
             saveState(); return { id: id };
         }
-        let data = null;
-        try { data = await res.json(); } catch (parseError) {}
-        if (!res.ok) {
-            const error = new Error((data && data.error) || '');
-            error.status = res.status;
-            error.apiMessage = data && data.error ? String(data.error) : '';
-            if (res.status === 401 && error.apiMessage === 'Please log in first.') {
-                error.sessionExpired = true;
-            }
-            throw error;
+        if (endpoint === 'schedules.php' && method === 'POST') { requireUser('admin');
+            if (body.action === 'toggle_status') { item = scheduleFor(body.id); if (!item) fail('Schedule not found.', 404); item.status = item.status === 'open' ? 'cancelled' : 'open'; saveState(); const view = scheduleView(item); return { id: item.id, status: view.status, status_label: view.status_label, status_color: view.status_color }; }
+            if (!body.class_id || !body.schedule_date || !body.start_time || !body.end_time || Number(body.capacity) < 1 || body.end_time <= body.start_time) fail('Please complete the schedule details.');
+            id = state.next.schedule++; state.schedules.push({ id: id, class_id: Number(body.class_id), date: body.schedule_date, start_time: body.start_time, end_time: body.end_time, capacity: Number(body.capacity), status: 'open' }); saveState(); return { id: id };
         }
         return data;
     };

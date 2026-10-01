@@ -235,6 +235,13 @@ document.addEventListener('DOMContentLoaded', function () {
     loadHomepageSchedule();
 
     document.addEventListener('click', async function (event) {
+        const scrollButton = event.target.closest('[data-scroll-target]');
+        if (scrollButton) {
+            const target = document.getElementById(scrollButton.dataset.scrollTarget);
+            if (target) target.scrollIntoView({ behavior: 'smooth' });
+            return;
+        }
+
         const scheduleButton = event.target.closest('[data-view-schedule]');
         if (scheduleButton) {
             const scheduleSection = document.getElementById('schedule');

@@ -1,4 +1,4 @@
-/* FitSpot shared helpers: API base, apiCall, escaping, and formatting.
+/* FitSpot shared helpers and browser-only data service.
    Loaded (with defer) after toast.js and before script.js / admin.js / user.js. */
 (function () {
     'use strict';

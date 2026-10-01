@@ -86,10 +86,8 @@ Frontend
 
 - HTML5
 - CSS3
-- JavaScript (fetch API, modals, hero carousel, admin panel, member portal)
-  Backend
-- PHP 8.1 + PDO (JSON API in `api/`, sessions, bcrypt password hashing)
-- MySQL 8.0 (schema, slot-usage view, seed data)
+- JavaScript (local data service, modals, hero carousel, admin panel, member portal)
+- Browser `localStorage` (seed data and current session)
 
 ## Database
 

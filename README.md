@@ -89,7 +89,7 @@ Frontend
 - JavaScript (local data service, modals, hero carousel, admin panel, member portal)
 - Browser `localStorage` (seed data and current session)
 
-## Database
+## Data Storage
 
 Full design, queries, and the overbooking-transaction pattern are in [`Database/MySQL/database.md`](Database/MySQL/database.md). Import the ready-made file to create the `fitspot` database:
 

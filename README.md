@@ -31,8 +31,8 @@ Open `index.html` directly in a browser, or use any simple static file server. N
 
 ## Main Features
 
-- User registration and login (connected to MySQL via `api/login.php` and `api/register.php`)
-- View membership plans, prices, and inclusions (live from the `membership_plans` table)
+- User registration and login (stored locally in the browser)
+- View membership plans, prices, and inclusions (stored locally in the browser)
 - Browse fitness classes such as Zumba, Yoga, Pilates, Boxing, and Strength Training
 - View available dates, times, and slots (live from `class_schedules` with real booked counts)
 - Book or cancel a class (capacity and duplicate-booking rules enforced in a MySQL transaction)

@@ -60,7 +60,77 @@
         } catch (error) { return seedState(); }
     }
 
-    window.SERVER_HINT = ' Could not reach the server - start it with: php -S localhost:8000';
+    let state = loadState();
+    function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+    function fail(message, status) {
+        const error = new Error(message);
+        error.status = status || 400;
+        error.apiMessage = message;
+        if (error.status === 401 && message === 'Please log in first.') error.sessionExpired = true;
+        throw error;
+    }
+    function currentUser() {
+        const id = Number(localStorage.getItem(SESSION_KEY));
+        return state.users.find(function (user) { return user.id === id; }) || null;
+    }
+    function requireUser(role) {
+        const user = currentUser();
+        if (!user) fail('Please log in first.', 401);
+        if (role && user.role !== role) fail('You do not have access to this action.', 403);
+        return user;
+    }
+    function statusInfo(status) {
+        return status === 'confirmed'
+            ? { label: 'Confirmed', color: 'badge-green' }
+            : status === 'cancelled'
+                ? { label: 'Cancelled', color: 'badge-gray' }
+                : { label: 'Pending', color: 'badge-orange' };
+    }
+    function classFor(schedule) { return state.classes.find(function (item) { return item.id === schedule.class_id; }); }
+    function scheduleFor(id) { return state.schedules.find(function (item) { return item.id === Number(id); }); }
+    function bookedCount(scheduleId) {
+        return state.bookings.filter(function (booking) {
+            return booking.schedule_id === scheduleId && booking.status !== 'cancelled';
+        }).length;
+    }
+    function displayTime(value) {
+        const parts = value.split(':');
+        const hour = Number(parts[0]);
+        return (hour % 12 || 12) + ':' + parts[1] + ' ' + (hour >= 12 ? 'PM' : 'AM');
+    }
+    function scheduleLabel(schedule) {
+        const date = new Date(schedule.date + 'T00:00:00');
+        return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) +
+            ' | ' + displayTime(schedule.start_time) + ' - ' + displayTime(schedule.end_time);
+    }
+    function planForUser(userId) {
+        const membership = state.memberships.find(function (item) { return item.user_id === userId && item.status === 'active'; });
+        return membership ? state.plans.find(function (plan) { return plan.id === membership.plan_id; }) : null;
+    }
+    function bookingView(booking) {
+        const schedule = scheduleFor(booking.schedule_id);
+        const fitnessClass = schedule && classFor(schedule);
+        const info = statusInfo(booking.status);
+        return { id: booking.id, schedule_id: booking.schedule_id, class_name: fitnessClass ? fitnessClass.name : 'Deleted class', schedule: schedule ? scheduleLabel(schedule) : '', status: booking.status, status_label: info.label, status_color: info.color, is_upcoming: Boolean(schedule && schedule.date >= dateOffset(0) && booking.status !== 'cancelled') };
+    }
+    function profileView(user) {
+        const membership = state.memberships.find(function (item) { return item.user_id === user.id && item.status === 'active'; });
+        const plan = membership && state.plans.find(function (item) { return item.id === membership.plan_id; });
+        let membershipView = null;
+        if (membership && plan) {
+            const expired = membership.end_date < dateOffset(0);
+            const end = new Date(membership.end_date + 'T00:00:00');
+            const days = Math.max(0, Math.ceil((end - new Date(dateOffset(0) + 'T00:00:00')) / 86400000));
+            membershipView = { plan: plan.name, price: plan.price, status: expired ? 'expired' : 'active', start_date: membership.start_date, end_date: membership.end_date, days_left: days };
+        }
+        return { id: user.id, full_name: user.full_name, email: user.email, role: user.role, phone: user.phone, address: user.address, created_at: user.created_at, membership: membershipView };
+    }
+    function scheduleView(schedule) {
+        const fitnessClass = classFor(schedule);
+        const booked = bookedCount(schedule.id);
+        const status = schedule.status === 'open' && booked < schedule.capacity ? 'open' : schedule.status === 'cancelled' ? 'cancelled' : 'full';
+        return { schedule_id: schedule.id, class_id: schedule.class_id, class_name: fitnessClass ? fitnessClass.name : 'Deleted class', name: fitnessClass ? fitnessClass.name : 'Deleted class', description: fitnessClass ? fitnessClass.description : '', date: schedule.date, schedule: scheduleLabel(schedule), booked: booked, capacity: schedule.capacity, remaining: Math.max(0, schedule.capacity - booked), percent: Math.min(100, Math.round(booked / schedule.capacity * 100)), status: status, status_label: status === 'open' ? 'Open' : status === 'full' ? 'Full' : 'Closed', status_color: status === 'open' ? 'badge-green' : status === 'full' ? 'badge-orange' : 'badge-gray', badge_label: status === 'open' ? 'Open' : status === 'full' ? 'Full' : 'Closed', badge_color: status === 'open' ? 'badge-green' : status === 'full' ? 'badge-orange' : 'badge-gray' };
+    }
 
     window.apiCall = async function (method, file, body) {
         const options = { method: method, headers: {} };

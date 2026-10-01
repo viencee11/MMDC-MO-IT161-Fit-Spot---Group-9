@@ -91,23 +91,7 @@ Frontend
 
 ## Data Storage
 
-Full design, queries, and the overbooking-transaction pattern are in [`Database/MySQL/database.md`](Database/MySQL/database.md). Import the ready-made file to create the `fitspot` database:
-
-```bash
-mysql -u root -p < Database/MySQL/fitspot.sql
-```
-
-| Table / View          | Purpose (Feature #)                                    |
-| --------------------- | ------------------------------------------------------ |
-| `users`               | Registration + login, admin and member accounts (1)    |
-| `membership_plans`    | Plans, prices, inclusions (2, 7)                       |
-| `memberships`         | Member's current plan and validity                     |
-| `fitness_classes`     | Zumba, Yoga, Pilates, Boxing, Strength Training (3, 7) |
-| `class_schedules`     | Class dates, times, and slots (4, 8)                   |
-| `bookings`            | Book/cancel reservations, upcoming bookings (5, 6, 8)  |
-| `v_slot_usage` (view) | Booked/capacity counts and Open/Full status (9)        |
-
-Seed data included: 2 membership plans, 5 fitness classes, 5 schedules, 4 accounts (1 admin, 3 members), 1 active/1 expired membership, and 3 demo bookings. Status: **the pages are connected to this database** through the PHP API.
+`js/api.js` seeds the plans, classes, schedules, demo accounts, memberships, and bookings on first use. Changes persist in browser `localStorage`; clear this site's storage to reset the demo data.
 
 ## Folder Structure
 

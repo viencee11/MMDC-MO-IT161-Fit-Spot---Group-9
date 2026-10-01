@@ -23,7 +23,7 @@ Demo accounts are seeded in the browser by `js/api.js`:
 
 Extra seeded members (for the admin Members page): `maria@email.com` / `maria123`, `pedro@email.com` / `pedro123`.
 
-Register now creates real member accounts (bcrypt-hashed passwords) - new accounts can log in right away.
+Register creates a member account in the current browser - new accounts can log in right away.
 
 ## How to Run
 
